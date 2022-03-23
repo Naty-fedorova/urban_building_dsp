@@ -63,23 +63,27 @@
 get_fam_probs <- function(
   house,
   savings,
-  land
+  land,
+  p_nothing = 0.1,        # prob of new person joining fam if fam has nothing
+  p_everything = 0.5,     # prob of new person joining fam if fam has everything
+  p_down_nothing = 0.01,  # prob of new person leaving fam if fam has nothing
+  p_down_everything = 0.001 # prob of new person leaving fam if fam has everything
 ) {
   p_base <- (house+savings+land-3) / 3
   
   # prob of new person joining the family (marriage or birth)
   # when we have nothing this is:
-  p_f_up_nothing <- 0.1
+  p_f_up_nothing <- p_nothing
   # when we have everything this is:
-  p_f_up_everything <- 0.2
+  p_f_up_everything <- p_everything
   # inbetween it's linear
   p_f_up <- p_base * p_f_up_everything + (1-p_base) * p_f_up_nothing
   
   # prob of someone dying
   # when we have nothing this is:
-  p_f_down_nothing <- 0.01
+  p_f_down_nothing <- p_down_nothing
   # when we have everything this is:
-  p_f_down_everything <- 0.001
+  p_f_down_everything <- p_down_everything
   # inbetween it's linear
   p_f_down <- p_base * p_f_down_everything + (1-p_base) * p_f_down_nothing
   
@@ -96,7 +100,7 @@ propensity_to_save <- function(fam_state) {
     return(1)
   }
   if(fam_state ==3){
-    return(0.75)
+    return(0.5)
   }
 }
 
@@ -348,20 +352,20 @@ UB_optimal <- function(
               # which is better?
               # record optimal behavior 
               
-              possible_current_payoffs <- c(payoff_build, payoff_save, payoff_move) # there is order of preference here, if payoffs end up being equal
+              possible_current_payoffs <- c(payoff_save, payoff_move, payoff_build) # there is order of preference here, if payoffs end up being equal
               # make note if payoffs are equal 
               if((length(unique(possible_current_payoffs))== 3) == FALSE) print(c(possible_current_payoffs, h = h, s = s, l = l, f = f ))
               best_payoff_ind <- which(possible_current_payoffs==max(possible_current_payoffs))[1]
               
-              if ( best_payoff_ind == 1 ) { # payoff_build
+              if ( best_payoff_ind == 3 ) { # payoff_build
                 strat[h, s, l, f, t] <- "build"
                 new_payoff[h, s, l, f] <- payoff_build
               }
-              if ( best_payoff_ind == 2 ) { # payoff_save
+              if ( best_payoff_ind == 1 ) { # payoff_save
                 strat[h, s, l, f, t] <- "save"
                 new_payoff[h, s, l, f] <- payoff_save
               }
-              if ( best_payoff_ind == 3 ) { # payoff_move
+              if ( best_payoff_ind == 2 ) { # payoff_move
                 strat[h, s, l, f, t] <- "move"
                 new_payoff[h, s, l, f] <- payoff_move
               }
@@ -413,17 +417,17 @@ optimal_strategy_output <- UB_optimal(states_h, states_s, states_l, states_f, fi
 #optimal_strategy_output <- UB_optimal(states_h, states_s, states_l, states_f, final_payoffs, maxt = 10, p_s_save = 0)
 
 
-#names(optimal_strategy_output[[2]]) <- c("maxt", "states_h", "states_s", "states_l", "states_f", "p_h_build", "p_s_save", "p_l_move", "build_condition", "p_s_loss", "p_force_move")
+names(optimal_strategy_output[[2]]) <- c("maxt", "states_h", "states_s", "states_l", "states_f", "p_h_build", "p_s_save", "p_l_move", "build_condition", "p_s_loss", "p_force_move")
 
 
 
 
 
 
+# TODO:
+# think more about get_fam_probs and how that interacts with the scenarios
+# maybe run a version of get_fam_probs that is only dependent on house
 
-
-# qs for Richard
-# what to do when payoffs are equal? random choice? have preferences? 
 
 
 

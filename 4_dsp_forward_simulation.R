@@ -18,7 +18,9 @@ sim_strat <- function(
   
   
   p_s_loss  = optimal_strategy_output[[2]]["p_s_loss"],        # prob of losing savings each t
-  p_force_move  = optimal_strategy_output[[2]]["p_force_move"] # prob of having to move each t
+  p_force_move  = optimal_strategy_output[[2]]["p_force_move"],# prob of having to move each t
+  
+  agent_init = "sample"                                        # "sample" or "start", sample means agents have sample of state values, start means agents all begin with lowest of states
   
 ){
   
@@ -34,12 +36,21 @@ sim_strat <- function(
   
   # intialize agents in first time step
   # atm just random sample from statespace
+  if(agent_init == "sample"){
   agent_prop[ , "agent", ] <- c(1:N)
   agent_prop[ , "h_state", 1] <- sample(states_of_h, N, replace = TRUE) 
   agent_prop[ , "s_state", 1] <- sample(states_of_s, N, replace = TRUE)
   agent_prop[ , "l_state", 1] <- sample(states_of_l, N, replace = TRUE)
   agent_prop[ , "f_state", 1] <- sample(states_of_f, N, replace = TRUE)
+  }
   
+  if(agent_init == "start"){
+    agent_prop[ , "agent", ] <- c(1:N)
+    agent_prop[ , "h_state", 1] <- rep(1, N)
+    agent_prop[ , "s_state", 1] <- rep(1, N)
+    agent_prop[ , "l_state", 1] <- rep(1, N)
+    agent_prop[ , "f_state", 1] <- rep(1, N)
+  }
   
   for(t in 1: maxt){
     

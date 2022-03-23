@@ -64,8 +64,41 @@ final_payoff_func <- function(scenario = "baseline") {
     )
   }
   
-  ## additive, each increase in state has payoff gains, saving more valuable when no tenure, building more valuable when have tenure
+  # baseline 
+  # savings are good
+  # tenure is good
+  # no effect of fam, or house
   if(scenario == "baseline"){
+    final_payoffs <- init_payoffs_array(
+      values = list(
+        #l=1, f=1
+        c( 1,  2,
+           1,  2),
+        #l=2, f=1
+        c( 3,  4,
+           3,  4),
+        
+        #l=1, f=2
+        c( 1,  2,
+           1,  2),
+        #l=2, f=2
+        c( 3,  4,
+           3,  4),
+        
+        #l=1, f=3
+        c( 1,  2,
+           1,  2),
+        #l=2, f=3
+        c( 3,  4,
+           3,  4)
+      ),
+      dim = c(states_h, states_s, states_l, states_f),
+      dimnames = c("h", "s", "l", "f")
+    )
+  }
+  
+  ## additive, each increase in state has payoff gains, saving more valuable when no tenure, building more valuable when have tenure
+  if(scenario == "additive"){
     final_payoffs <- init_payoffs_array(
       values = list(
         #l=1, f=1
@@ -97,29 +130,31 @@ final_payoff_func <- function(scenario = "baseline") {
   
   # fam growth is valued overall, but also tailoring to build env.
   # big fam with tenure and house is better off, house is overkill for single person, and would take away mobility options
-  if(scenario == "fam priority"){
+  # for pair house is as important then savings 
+  # single person does not need to prioritize house or tenure, savings more important
+  if(scenario == "fam and house"){
     final_payoffs <- init_payoffs_array(
       values = list(
         #l=1, f=1
-        c( 2,  2,
-           1,  1),
+        c( 1,  5,
+           1,  5),
         #l=2, f=1
-        c( 2,  2,
-           1,  1),
+        c( 1,  5,
+           1,  5),
         
         #l=1, f=2
-        c( 3,  3,
-           3,  3),
+        c( 5,  6,
+           5,  6),
         #l=2, f=2
-        c( 3,  3,
-           3,  3),
+        c( 7,  8,
+           8,  8),
         
         #l=1, f=3
-        c( 4,  4,
-           4,  4),
+        c( 9,  10,
+           9,  10),
         #l=2, f=3
-        c( 4,  4,
-           5,  5)
+        c( 11,  12,
+           13,  13)
       ),
       dim = c(states_h, states_s, states_l, states_f),
       dimnames = c("h", "s", "l", "f")
@@ -136,58 +171,56 @@ final_payoff_func <- function(scenario = "baseline") {
     final_payoffs <- init_payoffs_array(
       values = list(
         #l=1, f=1
-        c( 1,  1,
-           2,  2),
+        c( 1,  2,
+           1,  2),
         #l=2, f=1
-        c( 1,  1,
-           3,  3),
+        c( 3,  3,
+           4,  4),
         
         #l=1, f=2
-        c( 1,  1,
-           2,  2),
+        c( 1,  2,
+           1,  2),
         #l=2, f=2
-        c( 1,  1,
-           3,  3),
+        c( 3,  3,
+           4,  4),
         
         #l=1, f=3
-        c( 1,  1,
-           2,  2),
+        c( 1,  2,
+           1,  2),
         #l=2, f=3
-        c( 1,  1,
-           3,  3)
+        c( 3,  3,
+           4,  4)
       ),
       dim = c(states_h, states_s, states_l, states_f),
       dimnames = c("h", "s", "l", "f")
     )
   }
   
-  # family fit to house priority
+  # family priority
   # payoffs of house are dependent on family situation
-  # house is not more valuable defacto, it is only valuable if you are a pair, or fam
-  # if you are fam, ger living costs you
-  if(scenario == "fam and house"){
+  if(scenario == "family priority"){
     final_payoffs <- init_payoffs_array(
       values = list(
         #l=1, f=1
-        c( 2,  2,
-           2,  2),
+        c( 1,  2,
+           1,  2),
         #l=2, f=1
-        c( 2,  2,
-           2,  2),
+        c( 3,  4,
+           3,  4),
         
         #l=1, f=2
-        c( 2,  2,
-           2,  2),
+        c( 5,  6,
+           5,  6),
         #l=2, f=2
-        c( 2,  2,
-           3,  3),
+        c( 7,  8,
+           7,  8),
         
         #l=1, f=3
-        c( 2,  2,
-           3,  3),
+        c( 9,  10,
+           9,  10),
         #l=2, f=3
-        c( 1,  1,
-           4,  4)
+        c( 11,  12,
+           11,  12)
       ),
       dim = c(states_h, states_s, states_l, states_f),
       dimnames = c("h", "s", "l", "f")
@@ -196,13 +229,17 @@ final_payoff_func <- function(scenario = "baseline") {
   }
   
  
+  
   print(final_payoffs)
   return(final_payoffs)
   
 }
 
 
+
+
 # TODO: 
+
 
 
 
