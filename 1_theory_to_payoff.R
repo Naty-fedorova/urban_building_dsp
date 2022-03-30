@@ -97,6 +97,36 @@ final_payoff_func <- function(scenario = "baseline") {
     )
   }
   
+  # baseline where only fam matters
+  if(scenario == "baseline fam"){
+    final_payoffs <- init_payoffs_array(
+      values = list(
+        #l=1, f=1
+        c( 1,  1,
+           1,  1),
+        #l=2, f=1
+        c( 1,  1,
+           1,  1),
+        
+        #l=1, f=2
+        c( 2,  2,
+           2,  2),
+        #l=2, f=2
+        c( 2,  2,
+           2,  2),
+        
+        #l=1, f=3
+        c( 3,  3,
+           3,  3),
+        #l=2, f=3
+        c( 3,  3,
+           3,  3)
+      ),
+      dim = c(states_h, states_s, states_l, states_f),
+      dimnames = c("h", "s", "l", "f")
+    )
+  }
+  
   ## additive, each increase in state has payoff gains, saving more valuable when no tenure, building more valuable when have tenure
   if(scenario == "additive"){
     final_payoffs <- init_payoffs_array(

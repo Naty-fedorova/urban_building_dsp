@@ -1,6 +1,13 @@
 # summarise sim output to table
 
-plot_dsp_sim <- function(optimal_strategy_output, sim_output = sim_output, legend_x = 8, legend_y = 200, scenario = "default"){
+plot_dsp_sim <- function(optimal_strategy_output, 
+                         sim_output = sim_output, 
+                         legend_x = 8, 
+                         legend_y = 200, 
+                         scenario = "default", 
+                         lty = 1,
+                         tr = 1
+                         ){
   
   maxt <- optimal_strategy_output[[2]]["maxt"]
   
@@ -19,8 +26,9 @@ plot_dsp_sim <- function(optimal_strategy_output, sim_output = sim_output, legen
   
   # plot frequency of each beh in each timestep
   colors <- c("#3F3430", "#7DCFF7","#AE7A7C")
+  colors <- adjustcolor(colors, tr)
   plot(x = 1, y = 1, 
-       main = paste("Simulated behavioral frequencies, scenario = ", scenario),
+       main = paste("Simulated behavioral frequencies, \n scenario = ", scenario),
        xlab = "Time", 
        ylab = "Behavioral frequency",
        type = "n", 
@@ -36,7 +44,7 @@ plot_dsp_sim <- function(optimal_strategy_output, sim_output = sim_output, legen
       y <- beh_freq[t,e]
       ys <- c(ys, y)
     }
-    lines(xs, ys, col=colors[e], lwd = 1.5)
+    lines(xs, ys, col=colors[e], lwd = 1.5, lty = lty)
   }
   
   legend(x = legend_x, y = legend_y, 
@@ -54,7 +62,7 @@ plot_dsp_sim <- function(optimal_strategy_output, sim_output = sim_output, legen
 }#end function
 
 
-plot_dsp_sim(optimal_strategy_output = optimal_strategy_output)
+#plot_dsp_sim(optimal_strategy_output = optimal_strategy_output)
 
 
 

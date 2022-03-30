@@ -64,26 +64,25 @@ get_fam_probs <- function(
   house,
   savings,
   land,
-  p_nothing = 0.1,        # prob of new person joining fam if fam has nothing
-  p_everything = 0.5,     # prob of new person joining fam if fam has everything
-  p_down_nothing = 0.01,  # prob of new person leaving fam if fam has nothing
-  p_down_everything = 0.001 # prob of new person leaving fam if fam has everything
+  p_f_down_nothing = 0.01,     # prob of new person leaving fam if fam has nothing
+  p_f_down_everything = 0.01,  # prob of new person leaving fam if fam has everything
+  p_f_up_nothing = 0.1,           # prob of new person joining fam if fam has nothing
+  p_f_up_everything = 0.1         # prob of new person joining fam if fam has everything
+
 ) {
-  p_base <- (house+savings+land-3) / 3
+  
+  # positive relationship with house and land
+  # negative relationship with savings
+  # normalized between 0 and 1
+  p_base <- (house - savings + land) / 3
+  
+  if( p_base > 1 | p_base < 0 ) stop('p_f_down+p_f_up > 1')
   
   # prob of new person joining the family (marriage or birth)
-  # when we have nothing this is:
-  p_f_up_nothing <- p_nothing
-  # when we have everything this is:
-  p_f_up_everything <- p_everything
   # inbetween it's linear
   p_f_up <- p_base * p_f_up_everything + (1-p_base) * p_f_up_nothing
   
   # prob of someone dying
-  # when we have nothing this is:
-  p_f_down_nothing <- p_down_nothing
-  # when we have everything this is:
-  p_f_down_everything <- p_down_everything
   # inbetween it's linear
   p_f_down <- p_base * p_f_down_everything + (1-p_base) * p_f_down_nothing
   
@@ -103,68 +102,6 @@ propensity_to_save <- function(fam_state) {
     return(0.5)
   }
 }
-
-
-# final payoffs
-
-states_h <- 2            # number of states for house (ger, bashin)
-states_s <- 2            # number of states for savings (no have savings, have savings) 
-states_l <- 2            # number of states for land (no land, own land)
-states_f <- 3            # number of states for family composition(single, pair, with dependents)
-
-
-init_payoffs_array <- function(values, dim, dimnames) {
-  
-  data <- c()
-  for ( i in 1:length(values) ) { 
-    data <- c(data, t(array(values[[i]], c(dim[1], dim[2]))))
-  }
-  
-  dimnames_expanded <- list()
-  for ( i in 1:length(dim) )
-  { dimnames_expanded[[i]] <- sprintf("%s=%d", dimnames[i], 1:dim[i]) }
-  
-  
-  return(array(
-    data=data,
-    dim=dim,
-    dimnames=dimnames_expanded
-  ))
-}
-
-# when assigning payoffs - consider maximum over all states to be gained, and then maximum within each segment
-final_payoffs <- init_payoffs_array(
-  values = list(
-    #l=1, f=1
-    c( 1,  2,
-       1,  2),
-    #l=2, f=1
-    c( 1,  2,
-       2,  4),
-    
-    #l=1, f=2
-    c( 1,  2,
-       1,  2),
-    #l=2, f=2
-    c( 1,  2,
-       2,  4),
-    
-    #l=1, f=3
-    c( 1,  2,
-       2,  4),
-    #l=2, f=3
-    c( 2,  4,
-       4,  8)
-  ),
-  dim = c(states_h, states_s, states_l, states_f),
-  dimnames = c("h", "s", "l", "f")
-)
-final_payoffs
-
-
-
-# TODO:
-
 
 
 
@@ -238,6 +175,12 @@ UB_optimal <- function(
         s_up <- s+1
         if(s_up > states_s) s_up <- states_s
         
+        if(build_condition > 0){  
+          s_down_build <- s_down
+        } else{
+          s_down_build <- s
+        }
+        
         for ( l in 1:(states_l)) { 
           
           ## define payoffs when we move states
@@ -264,7 +207,7 @@ UB_optimal <- function(
             
             ## calculate expected payoffs
             
-            fam_probs <- get_fam_probs(h, s, l)
+            fam_probs <- get_fam_probs(house = h, savings = s, land = l)
             p_f_down <- fam_probs[1]
             p_f_up <- fam_probs[2]
             
@@ -275,9 +218,9 @@ UB_optimal <- function(
             payoff_build <- (
               (1-effective_p_force_move) * (
                 (1-p_s_loss) * (
-                  p_f_down * (p_h_build * payoff[h_up, s_down, l, f_down] + (1-p_h_build) * payoff[h, s, l, f_down]) +
-                    p_f_static * (p_h_build * payoff[h_up, s_down, l, f] + (1-p_h_build) * payoff[h, s, l, f]) +
-                    p_f_up * (p_h_build * payoff[h_up, s_down, l, f_up] + (1-p_h_build) * payoff[h, s, l, f_up]))
+                  p_f_down * (p_h_build * payoff[h_up, s_down_build, l, f_down] + (1-p_h_build) * payoff[h, s, l, f_down]) +
+                    p_f_static * (p_h_build * payoff[h_up, s_down_build, l, f] + (1-p_h_build) * payoff[h, s, l, f]) +
+                    p_f_up * (p_h_build * payoff[h_up, s_down_build, l, f_up] + (1-p_h_build) * payoff[h, s, l, f_up]))
                 +
                   (p_s_loss) * (
                     # NOTE: if you build, you already lose savings, so you can't really re-lose them

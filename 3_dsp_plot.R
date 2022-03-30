@@ -4,7 +4,8 @@ plot_optimal_strat <- function(optimal_strategy_output,
                                h = 1:2,
                                s = 1:2,
                                l = 1:2,
-                               f = 1:3){
+                               f = 1:3,
+                               lty = 1){
   maxt <- optimal_strategy_output[[2]]["maxt"]
   strat <- optimal_strategy_output[[1]]
   events <- c("build", "save", "move")
@@ -20,7 +21,7 @@ plot_optimal_strat <- function(optimal_strategy_output,
        ylab = "Behavioral frequency", 
        type = "n", 
        xlim = c(1, maxt), 
-       ylim = c(0, dim(strat)[1]*dim(strat)[2]*dim(strat)[3]*dim(strat)[4] + 10),
+       ylim = c(0, dim(strat)[1]*dim(strat)[2]*dim(strat)[3]*dim(strat)[4] + 1),
        bty = "n"
   )
   for (e in 1:length(events)) {
@@ -36,7 +37,7 @@ plot_optimal_strat <- function(optimal_strategy_output,
       }
       ys <- c(ys, y)
     }
-    lines(xs, ys, col=colors[e])
+    lines(xs, ys, col=colors[e], lty = lty)
   }
   
   legend(x = 8, y = 20, 
